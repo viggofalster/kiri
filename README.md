@@ -52,7 +52,7 @@ echo 0x1d6b > idVendor # Linux Foundation
 echo 0x0104 > idProduct # Multifunction Composite Gadget
 echo 0x0100 > bcdDevice # v1.0.0
 echo 0x0200 > bcdUSB # USB2
-mkdir -p strings/0x409=
+mkdir -p strings/0x409
 echo "2021080700000001" > strings/0x409/serialnumber
 echo "KIRI" > strings/0x409/manufacturer
 echo "KIRI (HID USB Proxy Device)" > strings/0x409/product
