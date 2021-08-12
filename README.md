@@ -34,45 +34,10 @@ echo "dwc2" | tee -a /etc/modules
 echo "libcomposite" | tee -a /etc/modules
 ```
 
-```sh
-touch /usr/bin/kiri_usb
-chmod +x /usr/bin/kiri_usb
-nano /usr/bin/kiri_usb
-```
-
-Add the following content - save and close the file afterwards.
+Add binary to PATH:
 
 ```sh
-#!/bin/bash
-# Sourced and modified based on from: https://www.isticktoit.net/?p=1383
-cd /sys/kernel/config/usb_gadget/
-mkdir -p heck_hid_proxy_keyb
-cd heck_hid_proxy_keyb
-echo 0x1d6b > idVendor # Linux Foundation
-echo 0x0104 > idProduct # Multifunction Composite Gadget
-echo 0x0100 > bcdDevice # v1.0.0
-echo 0x0200 > bcdUSB # USB2
-mkdir -p strings/0x409=
-echo "2021080700000001" > strings/0x409/serialnumber
-echo "KIRI" > strings/0x409/manufacturer
-echo "KIRI (HID USB Proxy Device)" > strings/0x409/product
-mkdir -p configs/c.1/strings/0x409
-echo "Config 1: ECM network" > configs/c.1/strings/0x409/configuration
-echo 250 > configs/c.1/MaxPower
-
-# Add functions here
-mkdir -p functions/hid.usb0
-echo 1 > functions/hid.usb0/protocol
-echo 1 > functions/hid.usb0/subclass
-echo 8 > functions/hid.usb0/report_length
-
-# usb descriptor equivalent to keybrd.hid seen with https://www.usb.org/document-library/hid-descriptor-tool
-echo -ne \\x05\\x01\\x09\\x06\\xa1\\x01\\x05\\x07\\x19\\xe0\\x29\\xe7\\x15\\x00\\x25\\x01\\x75\\x01\\x95\\x08\\x81\\x02\\x95\\x01\\x75\\x08\\x81\\x03\\x95\\x05\\x75\\x01\\x05\\x08\\x19\\x01\\x29\\x05\\x91\\x02\\x95\\x01\\x75\\x03\\x91\\x03\\x95\\x06\\x75\\x08\\x15\\x00\\x25\\x65\\x05\\x07\\x19\\x00\\x29\\x65\\x81\\x00\\xc0 > functions/hid.usb0/report_desc
-
-ln -s functions/hid.usb0 configs/c.1/
-# End functions
-
-ls /sys/class/udc > UDC
+sudo ln -s /root/kiri/kiri_usb /usr/bin
 ```
 
 Modify /etc/rc.local to call the script on boot.
@@ -117,8 +82,9 @@ Set up a service or e.g. crontab to run kiri.py on boot as a super-user (e.g. ro
 sudo -i
 crontab -e
 ```
+
 Add the following line
 
 ```
-@reboot python3 /root/kiri/kiri.py
+@reboot python3 /root/kiri/kiri.py >>/var/log/kiri.log
 ```
